@@ -42,10 +42,9 @@ ${DATASET}
   ```
 
 ### Use a Pre-trained Model
-- Download the pre-trained ScreenVAE model and place under `checkpoints/ScreenVAE/` folder.
-[ScreenVAE](https://drive.google.com/file/d/1QaXqR4KWl_lxntSy32QpQpXb-1-EP7_L/view?usp=sharing)
+- Download the pre-trained [ScreenVAE](https://drive.google.com/file/d/1QaXqR4KWl_lxntSy32QpQpXb-1-EP7_L/view?usp=sharing) model and place under `checkpoints/ScreenVAE/` folder.
+
 - Download the pre-trained color2manga model and place under `checkpoints/color2manga/` folder.
-[Color2Manga]
 - Generate results with the model
 ```bash
 bash ./scripts/test_western2manga.sh
