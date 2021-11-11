@@ -1,43 +1,73 @@
 # Bidirectional Translation
 
-Pytorch implementation for bidirectional translation between color comic and manga. 
+Pytorch implementation for multimodal comic-to-manga translation. 
 
-**Note**: The current software works well with PyTorch 1.1+. 
-
-## Example results
-
+**Note**: The current software works well with PyTorch 1.6.0+. 
 
 ## Prerequisites
 - Linux
 - Python 3
 - CPU or NVIDIA GPU + CUDA CuDNN
 
-
 ## Getting Started ###
 ### Installation
 - Clone this repo:
 ```bash
-git clone https://github.com/msxie92/ScreenStyle.git
-cd ScreenStyle/BidirectionalTranslation
+git clone https://github.com/msxie/ScreenStyle.git
+cd ScreenStyle/MangaScreening
 ```
 - Install PyTorch and dependencies from http://pytorch.org
-- Install python libraries [tensorboardX](https://github.com/lanpa/tensorboardX).
+- Install python libraries [tensorboardX](https://github.com/lanpa/tensorboardX)
+- Install other libraries
+For pip users:
+```
+pip install -r requirements.txt
+```
 
-
-### Dataset
-- We cannot release the whole dataset due to copyright issues. But you can generate synthesis manga dataset using [MangaLineExtraction](https://github.com/ljsabc/MangaLineExtraction) or download public available manga dataset [Manga109 dataset](http://www.manga109.org/en/).
-
-The training requires paired data (including manga image, line drawing, corresponding smoothed manga image and encoded screentone map). 
+## Data praperation
+The training requires paired data (including manga image, western image and their line drawings). 
 The line drawing can be extracted using [MangaLineExtraction](https://github.com/ljsabc/MangaLineExtraction).
-The smoothed manga image can be obtained applying [Image Smoothing via L0 Gradient Minimization](www.cse.cuhk.edu.hk/~leojia/projects/L0smoothing/).
-The encoded screentone map is generated with a variational autoencoder and please refer to the code of screenVAE.
 
+  ```
+${DATASET} 
+|-- color2manga 
+|   |-- val 
+|   |   |-- ${FOLDER}
+|   |   |   |-- imgs
+|   |   |   |   |-- 0001.png 
+|   |   |   |   |-- ...
+|   |   |   |-- line
+|   |   |   |   |-- 0001.png 
+|   |   |   |   |-- ...
+  ```
 
-### Model Training
-Coming soon ...
+### Use a Pre-trained Model
+- Download the pre-trained ScreenVAE model and place under `checkpoints/ScreenVAE/` folder.
+[ScreenVAE](https://drive.google.com/file/d/1QaXqR4KWl_lxntSy32QpQpXb-1-EP7_L/view?usp=sharing)
+- Download the pre-trained color2manga model and place under `checkpoints/color2manga/` folder.
+[Color2Manga]
+- Generate results with the model
+```bash
+bash ./scripts/test_western2manga.sh
+```
 
+## Copyright and License
+You are granted with the [LICENSE](LICENSE) for both academic and commercial usages.
 
-## Models
-Coming soon ...
+## Citation
+If you find the code helpful in your resarch or work, please cite the following papers.
+```
+@article{xie-2020-manga,
+        author   = {Minshan Xie and Chengze Li and Xueting Liu and Tien-Tsin Wong},
+        title    = {Manga Filling Style Conversion with Screentone Variational Autoencoder},
+        journal  = {ACM Transactions on Graphics (SIGGRAPH Asia 2020 issue)},
+        month    = {December},
+        year     = {2020},
+        volume   = {39},
+        number   = {6},
+        pages    = {226:1--226:15}
+    }
+```
 
-
+### Acknowledgements
+This code borrows heavily from the [pytorch-CycleGAN-and-pix2pix](https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix) repository.
