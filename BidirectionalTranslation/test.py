@@ -40,7 +40,7 @@ for folder in testdata:
         h = data['h']
         w = data['w']
         model.set_input(data)
-        fake_sty = model.get_z_random(1, 64, truncation=True)
+        fake_sty = model.get_z_random(1, 64, truncation=True, tvalue=1.25)
         fake_B, SCR, line = model.forward(AtoB=False, sty=fake_sty)
         images=[fake_B[:,:,:h,:w]]
         names=['color']
