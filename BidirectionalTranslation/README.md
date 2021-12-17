@@ -42,7 +42,7 @@ ${DATASET}
   ```
 
 ### Use a Pre-trained Model
-- Download the pre-trained [ScreenVAE](https://drive.google.com/file/d/1QaXqR4KWl_lxntSy32QpQpXb-1-EP7_L/view?usp=sharing) model and place under `checkpoints/ScreenVAE/` folder.
+- Download the pre-trained [ScreenVAE](https://drive.google.com/file/d/1OBxWHjijMwi9gfTOfDiFiHRZA_CXNSWr/view?usp=sharing) model and place under `checkpoints/ScreenVAE/` folder.
 
 - Download the pre-trained [color2manga](https://drive.google.com/file/d/18-N1W0t3igWLJWFyplNZ5Fa2YHWASCZY/view?usp=sharing) model and place under `checkpoints/color2manga/` folder.
 - Generate results with the model
