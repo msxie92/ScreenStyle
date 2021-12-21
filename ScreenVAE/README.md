@@ -45,6 +45,6 @@ Examples:
 ![edited](examples/edited.png)
 
 ## Models
-Download the pre-trained models from [Google Drive](https://drive.google.com/file/d/1QaXqR4KWl_lxntSy32QpQpXb-1-EP7_L/view?usp=sharing) and place under checkpoints/ScreenVAE.
+Download the pre-trained models from [Google Drive](https://drive.google.com/file/d/1OBxWHjijMwi9gfTOfDiFiHRZA_CXNSWr/view?usp=sharing) and place under checkpoints/ScreenVAE.
 
 
