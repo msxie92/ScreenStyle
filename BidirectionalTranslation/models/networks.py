@@ -1333,8 +1333,6 @@ class ScreenVAE(nn.Module):
             if isinstance(name, str):
                 load_filename = '%s_net_%s.pth' % (epoch, name)
                 load_path = os.path.join(self.save_dir, load_filename)
-                if not os.path.isfile(load_path):
-                    continue
                 net = getattr(self, name)
                 if isinstance(net, torch.nn.DataParallel):
                     net = net.module
