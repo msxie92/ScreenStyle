@@ -32,7 +32,7 @@ class CycleGANSTFTModel(BaseModel):
                                       init_type='xavier', init_gain=opt.init_gain, gpu_ids=self.gpu_ids, vaeLike=use_vae)
         self.nets = [self.netG_INTSCR2RGB, self.netG_RGB2INTSCR, self.netE]
 
-        self.netSVAE = networks.define_SVAE(inc=self.interchnnls, outc=1, outplanes=64, blocks=3, netVAE='SVAE', 
+        self.netSVAE = networks.define_SVAE(inc=1, outc=self.interchnnls, outplanes=64, blocks=3, netVAE='SVAE', 
             save_dir='checkpoints/ScreenVAE',init_type=opt.init_type, init_gain=opt.init_gain, gpu_ids=self.gpu_ids)
 
 
@@ -56,7 +56,7 @@ class CycleGANSTFTModel(BaseModel):
         if AtoB:
             real_LRGB = torch.cat([self.real_L, self.real_RGB],1)
             fake_SCR = self.netG_RGB2INTSCR(real_LRGB)
-            fake_M = self.netSVAE(fake_SCR, line=self.real_L, screen=False)
+            fake_M = self.netSVAE(fake_SCR, line=self.real_L, img_input=False)
             fake_M = torch.clamp(fake_M, -1,1)
             fake_M2 = self.norm(torch.mul(self.denorm(fake_M), self.denorm(self.real_L)))#*self.mask2
             return fake_M[:,:,:self.h, :self.w], fake_M2[:,:,:self.h, :self.w], fake_SCR[:,:,:self.h, :self.w]
@@ -66,7 +66,7 @@ class CycleGANSTFTModel(BaseModel):
             else:
                 z0 = sty
                 # z0 = self.get_z_random(self.real_A.size(0), self.opt.nz)
-            real_SCR = self.netSVAE(self.real_M, self.real_ML, rep=True) #8
+            real_SCR = self.netSVAE(self.real_M, self.real_ML, output_screen_only=True) #8
             real_LSCR = torch.cat([self.real_ML, real_SCR], 1)
             fake_nRGB = self.netG_INTSCR2RGB(real_LSCR, z0)
             fake_nRGB = torch.clamp(fake_nRGB, -1,1)
