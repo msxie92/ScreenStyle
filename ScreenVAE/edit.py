@@ -21,13 +21,13 @@ torch.cuda.set_device(0)
 def get_screenmap(img, line=None):
     img = torch.from_numpy(img[np.newaxis,np.newaxis,...]).float()*2-1.0
     line = torch.from_numpy(line[np.newaxis,np.newaxis,...]).float()*2-1.0
-    scr = model(img.cuda(), line.cuda(), rep=True).cpu().detach()
+    scr = model(img.cuda(), line.cuda(), output_screen_only=True).cpu().detach()
     scr = scr*(line+1)/2
     return scr.numpy()[0]
 
 def get_recons(scr):
     scr = torch.from_numpy(scr).unsqueeze(0).float()
-    outs = model(scr.cuda(), None, screen=True)*0.5+0.5
+    outs = model(scr.cuda(), None, img_input=False)*0.5+0.5
     return torch.clamp(outs,0,1).cpu().detach().numpy()[0,0]
 
 def getpca(scr):
