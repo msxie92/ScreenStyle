@@ -53,11 +53,11 @@ class ScreenVAE(nn.Module):
             assert(torch.cuda.is_available())
             self.gaborext.to(gpu_ids[0])
 
-    def npad(self, im, pad=128):
+    def npad(self, im, pad=128, value=0):
         h,w = im.shape[-2:]
         hp = h //pad*pad+pad
         wp = w //pad*pad+pad
-        return F.pad(im, (0, wp-w, 0, hp-h), mode='constant',value=1)
+        return F.pad(im, (0, wp-w, 0, hp-h), mode='constant',value=value)
 
     def forward(self, x, line=None, screen=False, rep=False):
         if line is None:
@@ -66,18 +66,18 @@ class ScreenVAE(nn.Module):
             line = torch.sign(line)
             x = torch.clamp(x + (1-line),-1,1)
         if not screen:
+            h,w = x.shape[-2:]
             input = torch.cat([x, line], 1)
-            # input = F.pad(input, (32, 32, 32, 32), mode='constant',value=1)
-            inter = self.enc(input)
-            scr, logvar = torch.split(inter, (self.outc, self.outc), dim=1)#[:,:,32:-32,32:-32]
-            # scr = scr*torch.sign(line+1)
+            input = self.npad(input,value=1)
+            inter = self.enc(input)[:,:,:h,:w]
+            scr, logvar = torch.split(inter, (self.outc, self.outc), dim=1)
             if rep:
                 return scr
             recons = self.dec(scr)
-            return recons, scr#, logvar
+            return recons, scr
         else:
             h,w = x.shape[-2:]
-            x = self.npad(x)
+            x = self.npad(x,value=0)
             recons = self.dec(x)[:,:,:h,:w]
             recons = (recons+1)*(line+1)/2-1
             return torch.clamp(recons,-1,1)
