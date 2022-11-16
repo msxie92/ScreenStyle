@@ -1304,7 +1304,7 @@ def define_SVAE(inc=96, outc=3, outplanes=64, blocks=1, netVAE='SVAE', model_nam
 
 
 class ScreenVAE(nn.Module):
-    def __init__(self,inc=4,outc=1, outplanes=64, downs=5, blocks=2,load_ext=True, save_dir='',init_type="normal", init_gain=0.02, gpu_ids=[]):
+    def __init__(self,inc=1,outc=4, outplanes=64, downs=5, blocks=2,load_ext=True, save_dir='',init_type="normal", init_gain=0.02, gpu_ids=[]):
         super(ScreenVAE, self).__init__()
         self.inc = inc
         self.outc = outc
@@ -1313,10 +1313,10 @@ class ScreenVAE(nn.Module):
         nl_layer=nn.LeakyReLU
 
         self.model_names=['enc','dec']
-        self.enc=define_C(outc+1, inc*2, 0, 24, netC='resnet_6blocks', 
+        self.enc=define_C(inc+1, outc*2, 0, 24, netC='resnet_6blocks', 
                                       norm='layer', nl='lrelu', use_dropout=True, init_type='kaiming', 
                                       gpu_ids=gpu_ids, upsample='bilinear')
-        self.dec=define_G(inc, outc, 0, 48, netG='unet_128_G', 
+        self.dec=define_G(outc, inc, 0, 48, netG='unet_128_G', 
                                       norm='layer', nl='lrelu', use_dropout=True, init_type='kaiming', 
                                       gpu_ids=gpu_ids, where_add='input', upsample='bilinear', use_noise=True)
 
@@ -1345,15 +1345,14 @@ class ScreenVAE(nn.Module):
                 net.load_state_dict(state_dict)
                 del state_dict
 
-
-    def npad(self, im, pad=128, value=0):
+    def npad(self, im, pad=128):
         h,w = im.shape[-2:]
         hp = h //pad*pad+pad
         wp = w //pad*pad+pad
-        return F.pad(im, (0, wp-w, 0, hp-h), mode='constant',value=value)
+        return F.pad(im, (0, wp-w, 0, hp-h), mode='replicate')
 
-    def forward(self, x, line=None, screen=True, rep=False):
-        if screen:
+    def forward(self, x, line=None, img_input=True, output_screen_only=True):
+        if img_input:
             if line is None:
                 line = torch.ones_like(x)
             else:
@@ -1361,16 +1360,16 @@ class ScreenVAE(nn.Module):
                 x = torch.clamp(x + (1-line),-1,1)
             h,w = x.shape[-2:]
             input = torch.cat([x, line], 1)
-            input = self.npad(input,value=1)
+            input = self.npad(input)
             inter = self.enc(input)[:,:,:h,:w]
-            scr, logvar = torch.split(inter, (self.inc, self.inc), dim=1)
-            if rep:
+            scr, logvar = torch.split(inter, (self.outc, self.outc), dim=1)
+            if output_screen_only:
                 return scr
             recons = self.dec(scr)
             return recons, scr, logvar
         else:
             h,w = x.shape[-2:]
-            x = self.npad(x,value=0)
+            x = self.npad(x)
             recons = self.dec(x)[:,:,:h,:w]
             recons = (recons+1)*(line+1)/2-1
             return torch.clamp(recons,-1,1)
