@@ -22,7 +22,7 @@ def test(X,line=None):
     X = X/127.5-1.0
     X = torch.from_numpy(X.transpose(2,0,1)).unsqueeze(0).float().cuda()
     line = torch.ones_like(X)
-    outs = model(X, line, screen=True)
+    outs = model(X, line, img_input=False)
     # Loss
     return torch.clamp(outs,-1,1).cpu().numpy()[0,0]
 
