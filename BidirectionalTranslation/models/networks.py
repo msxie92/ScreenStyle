@@ -1345,27 +1345,32 @@ class ScreenVAE(nn.Module):
                 net.load_state_dict(state_dict)
                 del state_dict
 
-    def load_gaborext(self, gpu_ids=[]):
-        self.gaborext = GaborWavelet()
-        self.gaborext.eval()
-        if len(gpu_ids) > 0:
-            assert(torch.cuda.is_available())
-            self.gaborext.to(gpu_ids[0])
+
+    def npad(self, im, pad=128, value=0):
+        h,w = im.shape[-2:]
+        hp = h //pad*pad+pad
+        wp = w //pad*pad+pad
+        return F.pad(im, (0, wp-w, 0, hp-h), mode='constant',value=value)
 
     def forward(self, x, line=None, screen=True, rep=False):
         if screen:
             if line is None:
-                line = torch.zeros_like(x)
+                line = torch.ones_like(x)
             else:
                 line = torch.sign(line)
                 x = torch.clamp(x + (1-line),-1,1)
-            gaborfeat = torch.cat([x, line], 1)
-            inter = self.enc(gaborfeat)
+            h,w = x.shape[-2:]
+            input = torch.cat([x, line], 1)
+            input = self.npad(input,value=1)
+            inter = self.enc(input)[:,:,:h,:w]
             scr, logvar = torch.split(inter, (self.inc, self.inc), dim=1)
             if rep:
                 return scr
             recons = self.dec(scr)
             return recons, scr, logvar
         else:
-            recons = self.dec(x)
-            return recons
+            h,w = x.shape[-2:]
+            x = self.npad(x,value=0)
+            recons = self.dec(x)[:,:,:h,:w]
+            recons = (recons+1)*(line+1)/2-1
+            return torch.clamp(recons,-1,1)
